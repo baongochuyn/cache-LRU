@@ -122,10 +122,14 @@ where
             let reader = BufReader::new(file);
             for line in reader.lines() {
                 let line = line?;
-                if let Some((key, value)) = line.split_once('=') {
-                    let k = K::from_str(key).expect("Failed to parse key");
-                    let v = V::from_str(value).expect("Failed to parse value");
-                    cache.put(k, v);
+                if let Some((kv, seq_str)) = line.split_once('\t') {
+                    if let Some((key, value)) = kv.split_once('=') {
+                        let k = K::from_str(key).expect("Failed to parse key");
+                        let v = V::from_str(value).expect("Failed to parse value");
+                        let seq = u64::from_str(seq_str).expect("Failed to parse sequence");
+                        cache.sequence = cache.sequence.max(seq);
+                        cache.map.insert(k, CacheEntry { value: v, sequence: seq });
+                    }
                 }
             }
         }
@@ -137,8 +141,11 @@ where
         let path = self.persist_path.as_ref().expect("No persist_path set");
         let _ = std::fs::remove_file(path);
         let mut file = File::create(path)?;
-        for (key, entry) in &self.map {
-            let line = format!("{}={}\n", key.to_string(), entry.value.to_string());
+
+        let mut entries: Vec<_> = self.map.iter().collect();
+        entries.sort_by_key(|(_, entry)| entry.sequence);
+        for (key, entry) in entries {
+            let line = format!("{}={}	{}\n", key.to_string(), entry.value.to_string(), entry.sequence);
             file.write_all(line.as_bytes())?;
         }
         Ok(())

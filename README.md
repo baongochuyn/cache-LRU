@@ -9,8 +9,8 @@ Un cache LRU est une structure de données qui stocke les éléments les plus r�
 Supposons un cache de taille 3 :
 - On insère A, B, C → le cache contient [A, B, C]
 - On insère D → le cache contient [B, C, D] (A est supprimé)
-- On lit B → B devient le plus récent
-- On insère E → le cache contient [C, D, E] (B est conservé si lu récemment)
+- On lit B → B devient le plus récent [C, D, B] 
+- On insère E → le cache contient [D, B, E]
 
 ## Fonctionnalités
 - Clé et valeur génériques (K, V)
@@ -77,6 +77,3 @@ cargo bench
   - `get(key)` : récupère une valeur et met à jour l'ordre LRU
   - `persist()` : sauvegarde le cache sur disque
   - `load_persistent()` : charge le cache depuis un fichier
-
-## Licence
-MIT

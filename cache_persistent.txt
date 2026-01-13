@@ -1,0 +1,3 @@
+C=valeur_C	3
+B=valeur_B	4
+D=valeur_D	5
