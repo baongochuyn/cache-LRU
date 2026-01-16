@@ -98,8 +98,8 @@ where
 // Persistence methods 
 impl<K, V> Cache<K, V>
 where
-    K: Eq + std::hash::Hash + Clone + ToString + FromStr,
-    V: Clone + ToString + FromStr,
+    K: Eq + std::hash::Hash + Clone + ToString + FromStr + std::fmt::Debug,
+    V: Clone + ToString + FromStr + std::fmt::Debug,
     <K as FromStr>::Err: std::fmt::Debug,
     <V as FromStr>::Err: std::fmt::Debug,
 {
@@ -127,8 +127,10 @@ where
                         let k = K::from_str(key).expect("Failed to parse key");
                         let v = V::from_str(value).expect("Failed to parse value");
                         let seq = u64::from_str(seq_str).expect("Failed to parse sequence");
-                        cache.sequence = cache.sequence.max(seq);
-                        cache.map.insert(k, CacheEntry { value: v, sequence: seq });
+                        cache.sequence = cache.sequence.max(seq); //garder la plus grande valeur de sequence rencontrée
+                        cache.map.insert(k.clone(), CacheEntry { value: v.clone(), sequence: seq });
+
+                        println!("Loaded: {:?} = {:?}", k, v);
                     }
                 }
             }

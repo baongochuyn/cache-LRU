@@ -17,4 +17,7 @@ fn main() {
     cache.persist().expect("Erreur lors de la sauvegarde du cache");
     println!("\nCache sauvegardé dans 'cache_persistent.txt'.");
     // => C B D
+
+    let cache2 = Cache::<String, String>::load_persistent(3, "cache_persistent.txt")
+    .expect("Impossible de charger le cache");
 }
